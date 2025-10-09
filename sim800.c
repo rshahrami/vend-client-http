@@ -1,0 +1,485 @@
+#include <stdlib.h>
+#include <stdint.h>
+#include <glcd.h>
+#include <delay.h>
+#include <string.h>
+#include "common.h"
+#include "sim800.h"
+
+//#define BUFFER_SIZE 512
+//#define MAX_RETRY   5   // ?????? ????? ????
+
+#define SIGNAL_CHECKS 5
+
+
+//char value[16];
+
+char at_command[60];
+char sim_number[15];
+
+//char buffer[BUFFER_SIZE];
+uint8_t attempts = 0;
+
+
+
+void sim800_restart(void) {
+    glcd_clear();
+    glcd_outtextxy(0, 0, "Restarting SIM800...");
+
+    // --- 1) ???? HTTP (??? ???? ???) ---
+    while (1) {
+        uart_buffer_reset();
+        send_at_command("AT+HTTPTERM");
+        // ??? OK ?? ERROR ???? ???? ????? ??????? (??? HTTP ???? ???? ERROR ??????)
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK")) break;
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "ERROR")) break;
+        glcd_outtextxy(0, 10, "Waiting HTTPTERM...");
+        delay_ms(50);
+    }
+
+    // --- 2) ???? SAPBR (bearer) ---
+    while (1) {
+        uart_buffer_reset();
+        send_at_command("AT+SAPBR=0,1");   // close bearer
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 3000, "OK")) break;
+        glcd_outtextxy(0, 10, "Waiting SAPBR=0,1...");
+        delay_ms(50);
+    }
+
+    // --- 3) ?? ?? ?? SAPBR ???? ??? (??????? ??? ????) ---
+    {
+        int ok = 0;
+        while (!ok) {
+            uart_buffer_reset();
+            send_at_command("AT+SAPBR=2,1"); // query
+            if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "SAPBR")) {
+                // ?????? ????? ????? ??? +SAPBR: 1,3,"0.0.0.0" ?? +SAPBR: 1,0,"0.0.0.0"
+                // ??? IP 0.0.0.0 ?? status != 1 ???? ???? ???? ???
+                if (strstr(buffer, "0.0.0.0") || strstr(buffer, ",0,") || strstr(buffer, ",3,")) {
+                    ok = 1; // ?? ??? ???? ?? ?? ???? ??? connected ???
+                    break;
+                }
+            }
+            // ??? ??? ????? ????? ?? ???? Connected ??? ????? ? ?????? ???? ??
+            glcd_outtextxy(0, 10, "Checking SAPBR closed...");
+            delay_ms(100);
+        }
+    }
+
+    // --- 4) detach ?? GPRS ---
+    while (1) {
+        uart_buffer_reset();
+        send_at_command("AT+CGATT=0");     // detach
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 3000, "OK")) break;
+        glcd_outtextxy(0, 10, "Waiting CGATT=0...");
+        delay_ms(50);
+    }
+
+    // --- 5) ???? ???? ?????????? (CFUN=1,1) ? ??? ??? ?? ????? ???? ????? ---
+    // ??? ????? ???? ??? ???? ????? ???? ?? ?? ????? ? ??? ?? ????? ?? ????? ?? AT ???? ??? ??? ??.
+    while (1) {
+        uart_buffer_reset();
+        send_at_command("AT+CFUN=1,1");
+        // ???? ??? OK ??????? ?? ??? ?? ?? ???? ??? ?? ??? ????? ????? ???? ???? ????? ???????.
+        // ????? ??? OK ??? ?? ?? ???? ??? ??? ????? "AT" ???? ????.
+        read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "RDY"); // (?????? ??? ?????)
+        // ????? ????? ?? ?? ??????? ?? AT ???? ???
+        glcd_outtextxy(0, 10, "Rebooting, wait for AT...");
+        while (1) {
+            uart_buffer_reset();
+            send_at_command("AT");
+            if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK")) {
+                // ????? ???? ???? ? ????? ???
+                goto after_reboot;
+            }
+            // ??? ?????? ?? ????? ????? ???? ????? ? delay ????????? ?????
+            delay_ms(50);
+        }
+    }
+after_reboot:
+
+    // --- 6) ????? ???? Echo ---
+    while (1) {
+        uart_buffer_reset();
+        send_at_command("ATE0");
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK")) break;
+        glcd_outtextxy(0, 10, "Waiting ATE0...");
+        delay_ms(50);
+    }
+
+    // --- 7) ??? ????? ????? ---
+    while (1) {
+        uart_buffer_reset();
+        send_at_command("AT");
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK")) break;
+        glcd_outtextxy(0, 10, "Final AT check...");
+        delay_ms(50);
+    }
+
+    glcd_outtextxy(0, 20, "Restart Done!");
+}
+
+
+unsigned char check_sim(void) {
+    int stat;
+    char *comma;
+    
+    glcd_clear();
+    // --- ????? ????? ???????? ---
+    uart_buffer_reset();
+    send_at_command("AT+CPIN?");
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "CPIN")) {
+//        glcd_outtextxy(0, 0, buffer); 
+//        delay_ms(5000); 
+        if (extract_field_after_keyword(buffer, "+CPIN:", 0, value, sizeof(value))) {
+            glcd_outtextxy(0, 16, value);  // ??? READY ?? PIN
+        }   
+        delay_ms(100);
+    } 
+    
+
+    // --- ????? ????? ???? ?? ???? ????? --- 
+    glcd_clear();
+    do { 
+        //glcd_clear();
+        uart_buffer_reset();
+        send_at_command("AT+CREG?");
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "CREG")) {
+//            glcd_outtextxy(0, 10, buffer);  // ????? ????? ???? 
+   
+            if (extract_field_after_keyword(buffer, "+CREG:", 1, value, sizeof(value))) { 
+//                glcd_outtextxy(0, 10, value); 
+//                delay_ms(100);
+//                stat = atoi(value);
+                if (atoi(value) == 1) break;
+            }
+        }
+        glcd_outtextxy(0, 15, "Waiting for network...");
+        
+    } while (1);
+    
+    glcd_clear();
+    glcd_outtextxy(0, 20, "Network OK!");
+    delay_ms(50);
+
+    return 1;  // ??????
+}
+
+
+
+unsigned char check_signal_quality(void) {
+    
+    uart_buffer_reset();
+    send_at_command("AT+CSQ");
+
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "CSQ")) {
+//        glcd_clear();
+//        glcd_outtextxy(0, 0, buffer);  
+
+        if (extract_field_after_keyword(buffer, "+CSQ:", 0, value, sizeof(value))) {
+            int csq = atoi(value);  // ????? ???? ?? ???
+            if (csq == 99) return 0;
+            glcd_clear();
+            glcd_outtextxy(0, 16, value);  // ????? ????? ?????? 
+            delay_ms(500);
+            //stat = atoi(value);
+            if (csq < 5) {
+                // ?????? ???? => ???? ?? ????
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+    }
+    return 0; // ??? ????? ????? ???????
+}
+
+
+
+unsigned char check_signal_with_restart(void)
+{
+    uint8_t i;  // ???? ?? for ????? ???
+
+    while (1) {
+        // ??? ???? ???????? ???? ????? ??????
+        for (i = 0; i < SIGNAL_CHECKS; i++) {
+            if (check_signal_quality()) {
+                return 1;                   // ?????? ??? ??
+            }
+            delay_ms(150);      // ??????? ????? ??? ??????
+            // ??? ??????? ???? ????? feed ??
+        }
+
+        // ??? ???? ????? ? ????????? ? ??? ???? ????
+        glcd_outtextxy(0, 0, "Signal weak. Restarting...");
+        sim800_restart();
+        check_sim();
+        delay_ms(100); // ??? ???? ???? ???????? ????
+    }
+}
+
+
+
+unsigned char init_sms(void)
+{
+    glcd_clear();
+    glcd_outtextxy(0, 0, "Setting SMS Mode...");        
+    
+    send_at_command("AT+CFUN=1");
+    delay_ms(50);
+
+    send_at_command("AT+CSCLK=0");
+    delay_ms(50);
+
+    // ????? SMS
+    send_at_command("AT+CMGF=1");
+    delay_ms(50);                
+    
+//    uart_buffer_reset();       //**************
+//    send_at_command("AT+CSCS=\"UCS2\"");        // UCS2 (åÒ)
+//    read_until_keyword_keep_all(buffer, BUFFER_SIZE, 50, "OK");  
+//
+//    uart_buffer_reset();      //**************
+//    send_at_command("AT+CSMP=17,167,0,8");      // DCS=UCS2
+//    read_until_keyword_keep_all(buffer, BUFFER_SIZE, 50, "OK");
+                                        
+    uart_buffer_reset();
+    send_at_command("AT+CNMI=2,2,0,0,0");
+    delay_ms(50);
+
+//    uart_buffer_reset();       //**************
+//    send_at_command("AT+CMGD=1,4");
+//    read_until_keyword_keep_all(buffer, BUFFER_SIZE, 100, "OK");
+
+    send_at_command("AT+CMGDA=\"DEL ALL\"");
+    delay_ms(50);
+
+    glcd_outtextxy(0, 10, "SMS Ready.");
+    delay_ms(50);
+
+    return 1;
+}
+
+
+
+unsigned char init_GPRS(void)
+{
+    uint8_t attempts = 0;
+    char at_command[80];
+    
+    glcd_clear();
+    glcd_outtextxy(0, 0, "Connecting to GPRS...");
+
+    send_at_command("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
+    delay_ms(100);
+
+    sprintf(at_command, "AT+SAPBR=3,1,\"APN\",\"%s\"", APN);
+    send_at_command(at_command);
+    delay_ms(100);
+    
+    uart_buffer_reset();
+    
+    send_at_command("AT+SAPBR=1,1");
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "OK")) {
+        glcd_outtextxy(0, 0, buffer);  // ???? ?? ????? "+CSQ: 11,0" ? "OK" ??? ???   
+        delay_ms(100);
+    }
+    
+    glcd_clear();
+    glcd_outtextxy(0, 0, "Fetching IP...");
+
+    while (attempts < 3) {
+        uart_buffer_reset();
+        send_at_command("AT+SAPBR=2,1");
+
+        if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "SAPBR")) {
+            // ??????? status (???? ??? ??? ?? +SAPBR:)
+            if (extract_field_after_keyword(buffer, "+SAPBR:", 1, value, sizeof(value))) {
+                if (atoi(value) == 1) { 
+                    // ??? status=1 ???? ???? ??? ???? IP ?? ???? ???
+                    if (extract_field_after_keyword(buffer, "+SAPBR:", 2, value, sizeof(value))) {
+                        glcd_clear();
+                        glcd_outtextxy(0, 0, value);
+                        delay_ms(300);
+                        return 1; // ????
+                    }
+                }
+            }
+        }
+
+        // ??? ?? ????? ???? ???? ???? ?????
+        attempts++;
+        delay_ms(100);
+    }
+
+    // ??? ?? 3 ??? ???? ??????
+    glcd_clear();
+    glcd_outtextxy(0, 0, "No IP");
+    return 0; // ??????
+}
+
+
+void gprs_keep_alive(void) {
+//    glcd_clear();
+//    glcd_outtextxy(0, 0, "Checking Internet...");  
+
+    uart_buffer_reset();
+    send_at_command("AT+HTTPTERM");
+    delay_ms(100);
+
+    // --- ???? HTTP ---
+    uart_buffer_reset();
+    send_at_command("AT+HTTPINIT");
+    delay_ms(100);
+
+    // --- ?????? ?????? GPRS ---
+    uart_buffer_reset();
+    send_at_command("AT+HTTPPARA=\"CID\",1");
+    delay_ms(100);
+
+    // --- ????? URL ---
+    uart_buffer_reset();
+    send_at_command("AT+HTTPPARA=\"URL\",\"http://www.google.com\"");
+    delay_ms(100);
+
+    // --- ????? ??????? GET ---
+    uart_buffer_reset();
+    send_at_command("AT+HTTPACTION=0"); // 0=GET
+    delay_ms(100); // ??? ???? ???? HTTP
+
+    // --- ????? ???? ---
+    uart_buffer_reset();
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "HTTPACTION")) {
+        // ???? ?????: +HTTPACTION:0,200,1256
+        // ???? ??? ??? ?? +HTTPACTION: ???? ?? ????? HTTP ???
+        if (extract_field_after_keyword(buffer, "+HTTPACTION:", 1, value, sizeof(value))) {
+//            status = atoi(value);  // ????? ???? ?? ???
+            glcd_outtextxy(0, 16, value);
+            delay_ms(100);
+//
+//            if (atoi(value) == 200) {
+//                glcd_outtextxy(0, 16, "Internet OK");
+//            } else {
+//                glcd_outtextxy(0, 16, "Internet Failed");
+//            }
+        } 
+//        else {
+//            glcd_outtextxy(0, 16, "Parsing Error!");
+//        }
+    } 
+//    else {
+//        glcd_outtextxy(0, 16, "No response!");
+//    }
+
+    
+
+    // --- ????? HTTP ---
+    uart_buffer_reset();
+    send_at_command("AT+HTTPTERM");
+    delay_ms(100);
+}
+
+
+uint8_t bringup_gprs_and_sms(void)
+{
+    uint8_t hard = 0;
+
+    while (1) {
+        // ????? ????? ?? ?????? ?? ?? ???? ???? ????? (????? ????????? ? check_sim ?? ???? ??????)
+        if (check_signal_with_restart()) {
+            // ???? ?????? ??? ??? ???? ???? GPRS
+            if (init_GPRS()) {
+                // ?? ?? ?????? ????? SMS ?? ????? ?? ? ???? ??
+                init_sms();
+                return 1;
+            }
+        }
+
+        // ???? GPRS
+        hard++;
+        if (hard >= 3) {                  // ?? 3 ???? GPRS ?????? ????????? ???
+            sim800_restart();
+            hard = 0;                     // ??????? ??????? ??? ???
+        }
+
+        glcd_outtextxy(0, 0, "GPRS Init Failed!");
+        delay_ms(200);                    // ??? ????? ??? ??????? (??????? ?? ????? feed ?? ??? ????)
+    }
+}
+
+
+
+// ???????????: 1 ???? ??????? ok ? ??????? gprs_keep_alive ?? ??? ?????
+// 0 ???? ??????? ????? ??/????? ????? ??? ? ??? ???? keep-alive ?? ?? ??.
+uint8_t net_precheck_or_recover(void)
+{
+    // 0) AT ????
+    uart_buffer_reset();
+    send_at_command("AT");
+    if (!read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK")) {
+        glcd_outtextxy(0, 0, "No AT -> Reboot");
+        sim800_restart();
+        bringup_gprs_and_sms();
+        return 0;
+    }
+
+    // 1) ????? attach
+    uart_buffer_reset();
+    send_at_command("AT+CGATT?");
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+CGATT:")) {
+        if (extract_field_after_keyword(buffer, "+CGATT:", 0, value, sizeof(value))) {
+            if (atoi(value) != 1) {
+                glcd_outtextxy(0, 0, "CGATT=0 -> Recover");
+                bringup_gprs_and_sms();
+                return 0;
+            }
+        }
+    } else {
+        glcd_outtextxy(0, 0, "CGATT? timeout");
+        bringup_gprs_and_sms();
+        return 0;
+    }
+
+    // 2) ????? bearer (SAPBR)
+    uart_buffer_reset();
+    send_at_command("AT+SAPBR=2,1");
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+SAPBR:")) {
+        // +SAPBR: 1,<stat>,"<ip>"
+        if (extract_field_after_keyword(buffer, "+SAPBR:", 1, value, sizeof(value))) {
+            int stat = atoi(value);
+            if (stat != 1) {
+                // ???? ??? ???? ??? ???? bearer
+                uart_buffer_reset();
+                send_at_command("AT+SAPBR=1,1");
+                read_until_keyword_keep_all(buffer, BUFFER_SIZE, 3000, "OK");
+
+                // ???????? ?????
+                uart_buffer_reset();
+                send_at_command("AT+SAPBR=2,1");
+                if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+SAPBR:") &&
+                    extract_field_after_keyword(buffer, "+SAPBR:", 1, value, sizeof(value)) &&
+                    atoi(value) == 1) {
+                    return 1; // ok ??? keep-alive ????? ???
+                }
+
+                glcd_outtextxy(0, 0, "Bearer fail -> Recover");
+                bringup_gprs_and_sms();
+                return 0;
+            }
+            // ???????: IP ?? ?? ?? ???? ?? 0.0.0.0 ?????
+            if (extract_field_after_keyword(buffer, "+SAPBR:", 2, value, sizeof(value))) {
+                if (strstr(value, "0.0.0.0")) {
+                    glcd_outtextxy(0, 0, "No IP -> Recover");
+                    bringup_gprs_and_sms();
+                    return 0;
+                }
+            }
+            return 1; // bearer ok? IP ?? ????? ??? keep-alive
+        }
+    }
+
+    // ??? ???? ???/???????? ??
+    glcd_outtextxy(0, 0, "SAPBR? timeout -> Recover");
+    bringup_gprs_and_sms();
+    return 0;
+}

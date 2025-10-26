@@ -14,20 +14,20 @@ void send_at_command(char *command)
 }
 
 // --- Å«ò ò—œ‰ »«›— USART0 ---
-void uart_flush0(void)
-{
-    unsigned char dummy;
-
-    // Å«ò ò—œ‰ —ÃÌ” — ”Œ ù«›“«—Ì
-    while (UCSR0A & (1<<RXC0)) {
-        dummy = UDR0;
-    }
+//void uart_flush0(void)
+//{
+//    unsigned char dummy;
 //
-//    // Å«ò ò—œ‰ »«›— ‰—„ù«›“«—Ì
-//    rx_wr_index0 = rx_rd_index0 = 0;
-//    rx_counter0 = 0;
-//    rx_buffer_overflow0 = 0;
-}
+//    // Å«ò ò—œ‰ —ÃÌ” — ”Œ ù«›“«—Ì
+//    while (UCSR0A & (1<<RXC0)) {
+//        dummy = UDR0;
+//    }
+////
+////    // Å«ò ò—œ‰ »«›— ‰—„ù«›“«—Ì
+////    rx_wr_index0 = rx_rd_index0 = 0;
+////    rx_counter0 = 0;
+////    rx_buffer_overflow0 = 0;
+//}
 
 
 void uart_buffer_reset(void) {
@@ -155,96 +155,10 @@ int extract_field_after_keyword(const char* input, const char* keyword, int fiel
     return 0; // ›Ì·œ „Ê—œ‰Ÿ— ÅÌœ« ‰‘œ
 }
 
+void buzzer(unsigned long timeout_ms){
 
-//
-//int extract_field_after_keyword(const char* input, const char* keyword, int field_index, char* out_value, int out_size)
-//{
-//    int current_field = 0;
-//    int i = 0;
-//    const char* p = strstr(input, keyword);
-//    
-//    if (!p) return 0; // ò·ÌœÊ«éÂ ÅÌœ« ‰‘œ
-//
-//    p += strlen(keyword);      // »—Ê »⁄œ «“ ò·ÌœÊ«éÂ
-//    while (*p == ' ' || *p == '\t') p++; // —œ ò—œ‰ ›«’·ÂùÂ«
-//
-//    while (*p && current_field <= field_index)
-//    {
-//        if (current_field == field_index)
-//        {
-//            // òÅÌ ò—œ‰ „ﬁœ«— ›⁄·Ì  « ò«„« Ì« CRLF Ì« «”ÅÌ”
-//            while (*p && *p != ',' && *p != '\r' && *p != '\n' && i < out_size - 1)
-//            {
-//                out_value[i++] = *p++;
-//            }
-//            out_value[i] = '\0';
-//            return 1; // „Ê›ﬁ
-//        }
-//
-//        // —› ‰ »Â ò«„«Ì »⁄œÌ
-//        while (*p && *p != ',') p++;
-//        if (*p == ',') p++; // —œ ò—œ‰ ò«„«
-//        current_field++;
-//    }
-//
-//    return 0; // ›Ì·œ „Ê—œ‰Ÿ— ÅÌœ« ‰‘œ
-//}
+    BUZER_PORT |= (1 << BUZER_PIN); 
+    delay_ms(timeout_ms); 
+    BUZER_PORT &= ~(1 << BUZER_PIN);
 
-
-
-//unsigned char read_serial_response(char* buffer, int buffer_size, int timeout_ms, const char* end_pattern) {
-//    int i = 0;
-//    unsigned int elapsed = 0;
-//
-//    memset(buffer, 0, buffer_size);
-//
-//    while (elapsed < (unsigned)timeout_ms) {
-//        while (rx_counter0 > 0 && i < buffer_size - 1) {
-//            buffer[i++] = getchar();
-//        }
-//
-//        // »——”Ì «·êÊÌ Å«Ì«‰ œ«œÂ
-//        if (end_pattern != NULL && strstr(buffer, end_pattern)) {
-//            buffer[i] = '\0';
-//            return 1;
-//        }
-//
-//        if (i >= buffer_size - 1) {
-//            buffer[i] = '\0';
-//            return 1;
-//        }
-//
-//        delay_ms(1);
-//        elapsed++;
-//    }
-//
-//    buffer[i] = '\0';
-//    return (i > 0);
-//}
-
-
-//// --- ŒÊ«‰œ‰ Å«”Œ ”—Ì«· »« timeout ---
-//unsigned char read_serial_response(char* buffer, int buffer_size, int timeout_ms, const char* expected_response) {
-//    int i = 0;
-//    unsigned int elapsed = 0;
-//
-//    // ?C? ??I? EC?? ?C?E?
-//    memset(buffer, 0, buffer_size);
-//
-//    while (elapsed < (unsigned)timeout_ms) {
-//        // ?? EC?? E?C? EC?E??C? I? I?E?? ????? UART ?C EI?C??I
-//        while (rx_counter0 > 0 && i < buffer_size - 1) {
-//            buffer[i++] = getchar();  // getchar C? ????? EC?? ???A?I
-//        }
-//        // C?? C?EUC??C? ?C I?I??? ??I E???I??
-//        if (strstr(buffer, expected_response)) {
-//            return 1;
-//        }
-//        delay_ms(1);
-//        elapsed++;
-//    }
-//    // ?? C? ?C?C? EC???C?E ?? ??EC? I??? ?? ???????
-//    return (strstr(buffer, expected_response) != NULL);
-//}
-
-
+}

@@ -7,7 +7,7 @@ A=
 C=
 D=8/7/2025
 Files=4
-OpenedFiles=10
+OpenedFiles=7
 OF1=glcd_keypad_sim.c
 Active1=1
 DebugOutputListFilesDirectory=Debug\List
@@ -26,38 +26,38 @@ Active0=0
 EditorPanel0=0
 PageIndex0=0
 EditorPanel1=0
-TimeStamp1=1530822400
+TimeStamp1=1532451296
 PageIndex1=1
 OF2=sim800.c
 Active2=0
 EditorPanel2=0
-TimeStamp2=1530821742
+TimeStamp2=1532496951
 PageIndex2=2
 OF3=sim800.h
 Active3=0
 EditorPanel3=0
-TimeStamp3=1530821762
+TimeStamp3=1532495596
 PageIndex3=3
 OF4=common.c
 Active4=0
 EditorPanel4=0
-TimeStamp4=1530427805
+TimeStamp4=1532430757
 PageIndex4=4
 OF5=common.h
 Active5=0
 EditorPanel5=0
-TimeStamp5=1530427805
+TimeStamp5=1532430781
 PageIndex5=5
-OF6=motor.c
+OF6=bitmaps.h
 Active6=0
 EditorPanel6=0
-TimeStamp6=1530427805
+TimeStamp6=1532430756
 PageIndex6=6
 OF7=keypad.c
 Active7=0
 EditorPanel7=0
 TimeStamp7=1530427805
-PageIndex7=8
+PageIndex7=7
 OF8=keypad.h
 Active8=0
 EditorPanel8=0
@@ -175,8 +175,8 @@ WatchAVR8LAutoVariables=0
 UseEEPROMLocation0=1
 RebuildAll=0
 LinkageInformationPresent=1
-COFFileTimeStamp=1531548750
-Build=192
+COFFileTimeStamp=1532496969
+Build=223
 [DefinedSymbolsDebug]
 Count=0
 [Compiler]
@@ -278,7 +278,7 @@ UseEEPROMLocation0=1
 RebuildAll=1
 LinkageInformationPresent=0
 COFFileTimeStamp=-1
-Build=192
+Build=223
 IncludePath0=
 IncludePath1=
 IncludePath2=
@@ -551,42 +551,42 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 192
-L18=34310 line(s) compiled
+L17=Build: 222
+L18=34195 line(s) compiled
 L19=No errors
-L20=28 warning(s)
+L20=6 warning(s)
 L21=
 L22=Bit variables area: 0x2 to 0x2
 L23=Bit variables size: 1 byte(s)
 L24=
 L25=Data Stack area: 0x100 to 0x4FF
 L26=Data Stack size: 1024 byte(s)
-L27=Estimated Data Stack usage: 464 byte(s)
+L27=Estimated Data Stack usage: 554 byte(s)
 L28=
-L29=RAM Global variables area: 0x500 to 0xCC9
-L30=RAM Global variables size: 1994 byte(s)
+L29=RAM Global variables area: 0x500 to 0xBFF
+L30=RAM Global variables size: 1792 byte(s)
 L31=
-L32=Hardware Stack area: 0xCCA to 0x10FF
-L33=Hardware Stack size: 1078 byte(s)
+L32=Hardware Stack area: 0xC00 to 0x10FF
+L33=Hardware Stack size: 1280 byte(s)
 L34=
 L35=Heap size: 0 byte(s)
 Lines=39
 L36=
 L37=EEPROM usage: 0 byte(s), 0.0% of EEPROM
-L38=Program size: 9769 words (19538 bytes), 29.8% of FLASH
-L39=777 words (1554 bytes), 7.4% reduced by Code Compression
+L38=Program size: 9938 words (19876 bytes), 30.3% of FLASH
+L39=761 words (1522 bytes), 7.1% reduced by Code Compression
 [BuildInfoAssembler]
 Lines=12
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=D:\project\vending\code\code-http\Debug\List\glcd_keypad_sim.asm(9584): No EEPROM data, deleting D:\project\vending\code\code-http\Debug\Exe\glcd_keypad_sim.eep
+L4=D:\project\vending\code\code-http\Debug\List\glcd_keypad_sim.asm(9808): No EEPROM data, deleting D:\project\vending\code\code-http\Debug\Exe\glcd_keypad_sim.eep
 L5=
 L6=ATmega64A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x004c52  10390   9148  19538   65536  29.8%
-L10=[.dseg] 0x000100 0x000cca      0   1994   1994    4096  48.7%
+L9=[.cseg] 0x000000 0x004da4  10958   8918  19876   65536  30.3%
+L10=[.dseg] 0x000100 0x000c00      0   1792   1792    4096  43.8%
 L11=[.eseg] 0x000000 0x000000      0      0      0    2048   0.0%
 L12=
 [BookmarksFoldedCode]
@@ -613,11 +613,11 @@ F19=sim800.c
 F20=motor.c
 F21=D:\project\vending\code\full\glcd_keypad_sim\bitmaps.c
 [Bookmarks1]
-TimeStamp=1530427805
-Row=0
-Column=0
+TimeStamp=1532430756
+Row=926
+Column=23
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=900
 BK0=-1
 BK1=-1
 BK2=-1
@@ -651,13 +651,13 @@ Row=0
 Column=0
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1530998982
+TimeStamp=1532517730
 [Bookmarks3]
-TimeStamp=1530822400
-Row=618
-Column=16
+TimeStamp=1532496202
+Row=0
+Column=0
 ScrollPosX=0
-ScrollPosY=610
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -705,8 +705,8 @@ BK9=-1
 [FoldedCode5]
 Blocks=0
 [Bookmarks6]
-TimeStamp=1530427805
-Row=0
+TimeStamp=1532430781
+Row=15
 Column=0
 ScrollPosX=0
 ScrollPosY=0
@@ -721,11 +721,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks7]
-TimeStamp=1530427805
-Row=0
+TimeStamp=1532430757
+Row=157
 Column=0
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=1
 BK0=-1
 BK1=-1
 BK2=-1
@@ -792,10 +792,10 @@ BK9=-1
 Blocks=0
 [Bookmarks11]
 TimeStamp=1530427805
-Row=0
+Row=50
 Column=0
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=27
 BK0=-1
 BK1=-1
 BK2=-1
@@ -909,11 +909,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks18]
-TimeStamp=1530821762
-Row=16
-Column=38
+TimeStamp=1532495596
+Row=19
+Column=23
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=11
 BK0=-1
 BK1=-1
 BK2=-1
@@ -927,11 +927,11 @@ BK9=-1
 [FoldedCode17]
 Blocks=0
 [Bookmarks19]
-TimeStamp=1530821742
-Row=249
-Column=0
+TimeStamp=1532496951
+Row=288
+Column=8
 ScrollPosX=0
-ScrollPosY=228
+ScrollPosY=242
 BK0=-1
 BK1=-1
 BK2=-1
@@ -984,25 +984,11 @@ Line6=789
 Line7=920
 Line8=1051
 Blocks=8
-[FoldedCode3]
-Blocks=0
-[FoldedCode7]
-Blocks=0
-[FoldedCode11]
-Blocks=0
-[FoldedCode19]
-Blocks=0
 [FoldedCode13]
-Blocks=0
-[FoldedCode1]
-Blocks=0
-[FoldedCode12]
 Blocks=0
 [FoldedCode20]
 Blocks=0
-[FoldedCode6]
-Blocks=0
-[FoldedCode18]
+[FoldedCode12]
 Blocks=0
 [HeadersList]
 Files=4
@@ -1026,12 +1012,12 @@ F11=D:\install_program\cvavr\inc\stdarg.h
 F12=D:\install_program\cvavr\inc\string.h
 F13=D:\install_program\cvavr\inc\stdlib.h
 F14=D:\install_program\cvavr\inc\delay.h
-F15=bitmaps.h
-F16=common.h
+F15=D:\install_program\cvavr\inc\ctype.h
+F16=D:\install_program\cvavr\inc\stddef.h
 F17=D:\install_program\cvavr\inc\stdint.h
-F18=keypad.h
-F19=motor.h
-F20=init_sms.h
+F18=bitmaps.h
+F19=common.h
+F20=keypad.h
 F21=sim800.h
 [Header2]
 Files=14
@@ -1084,3 +1070,17 @@ F13=D:\install_program\cvavr\inc\stdio.h
 F14=D:\install_program\cvavr\inc\io.h
 F15=D:\install_program\cvavr\inc\stdarg.h
 F16=sim800.h
+[FoldedCode3]
+Blocks=0
+[FoldedCode7]
+Blocks=0
+[FoldedCode11]
+Blocks=0
+[FoldedCode19]
+Blocks=0
+[FoldedCode1]
+Blocks=0
+[FoldedCode6]
+Blocks=0
+[FoldedCode18]
+Blocks=0

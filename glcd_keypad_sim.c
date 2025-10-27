@@ -187,7 +187,7 @@ unsigned long millis(void)
 void activate_motor(int product_id)
 {
     unsigned char motor_pin;
-    char motor_msg[20]; 
+    char motor_msg[20];
     int timeout = 1000;
 
     switch (product_id)
@@ -202,17 +202,17 @@ void activate_motor(int product_id)
     glcd_clear();
     glcd_outtextxy(10, 20, motor_msg);
     MOTOR_PORT |= (1 << motor_pin);
-    
+
     while (!(PIND & (1 << PIND1)) && timeout > 0)
     {
         delay_ms(1);
         timeout--;
     }
- 
-    MOTOR_PORT &= ~(1 << motor_pin); 
+
+    MOTOR_PORT &= ~(1 << motor_pin);
 //    glcd_clear();
 //    glcd_outtextxy(10, 20, motor_msg);
-     
+
     glcd_clear();
     draw_bitmap(0, 0, mahsol_ra_bardarid, 128, 64);
     delay_ms(500);
@@ -242,7 +242,7 @@ static void ucs2hex_digits_to_ascii_core(const char *in, char *out, size_t outsz
     size_t w = 0;
     size_t i;
     unsigned cp;
-    
+
     for (i = 0; in[i] && in[i+3] && w+1 < outsz; i += 4) {
         int h0=hexv(in[i]), h1=hexv(in[i+1]), h2=hexv(in[i+2]), h3=hexv(in[i+3]);
         if (h0<0||h1<0||h2<0||h3<0) { out[w++]='?'; break; }
@@ -261,7 +261,7 @@ static void normalize_digits_utf8_core(const char *in, char *out, size_t outsz){
     size_t w = 0;
     size_t i;
     unsigned char c;
-    
+
     for (i = 0; in[i] && w+1 < outsz; ){
         c = (unsigned char)in[i];
 
@@ -311,44 +311,59 @@ unsigned char send_data(const char* base_url, const char* phone_number, int prod
     char full_url[255];
 //    char *action_ptr;
 //    int method = 0, status_code = 0, data_len = 0;
+    glcd_clear();
+    glcd_outtextxy(0, 0, "test 1");
 
-    // ??C?O ??C? ??? GLCD
-//    glcd_clear();
-//    draw_bitmap(0, 0, lotfan_montazer_bemanid, 128, 64);
-//
-//    uart_buffer_reset(); send_at_command("AT+HTTPTERM"); 
-//    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-//
-//    // --- ???? HTTP ---
-//    uart_buffer_reset(); send_at_command("AT+HTTPINIT");
-//    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-//
-//    // --- ?????? ?????? GPRS ---
-//    uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"CID\",1");
-//    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-    
-    // --- ÊäÙíã URL ---
+    uart_buffer_reset(); send_at_command("AT+HTTPTERM");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+
+    // --- ???? HTTP ---
+    uart_buffer_reset(); send_at_command("AT+HTTPINIT");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+
+    // --- ?????? ?????? GPRS ---
+    uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"CID\",1");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+
+    //http_connect();
+    glcd_clear();
+    glcd_outtextxy(0, 0, "test 2");
+
+     //--- ÊäÙíã URL ---
     uart_buffer_reset();
     //sprintf(full_url, "%s?phone_number=%s", base_url, phone_number);
-    snprintf(full_url, sizeof(full_url), 
-             "%s?phone_number=%s", 
-             base_url, phone_number);  
-             
+    snprintf(full_url, sizeof(full_url),
+            "%s?ph=%s&d=%d&p=%d",
+            base_url, phone_number, device_id, product_id);
+
+    glcd_clear();
+    glcd_outtextxy(0, 0, full_url);
+
     sprintf(cmd, "AT+HTTPPARA=\"URL\",\"%s\"", full_url);
     uart_buffer_reset(); send_at_command(cmd);
     (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
 
+    glcd_clear();
+    glcd_outtextxy(0, 0, buffer);
+
+
     // --- ????? ??????? GET ---
     uart_buffer_reset(); send_at_command("AT+HTTPACTION=0"); // 0=GET
-    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 10000, "HTTPACTION")) {
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "HTTPACTION")) {
         if (extract_field_after_keyword(buffer, "+HTTPACTION:", 1, value, sizeof(value))) {
             if(atoi(value) == 200) return 1;
-        } 
+        }
 
-    } 
-    
-    //return (atoi(value) == 200) ? 1 : 0; 
+
+    }
+
+    glcd_clear();
+    glcd_outtextxy(0, 0, buffer);
+    delay_ms(500);
+
+    //return (atoi(value) == 200) ? 1 : 0;
     return 0;
+
 }
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -365,38 +380,52 @@ unsigned char get_data(const char* base_url, const char* phone_number) {
     glcd_clear();
     draw_bitmap(0, 0, lotfan_montazer_bemanid, 128, 64);
 
-//    uart_buffer_reset(); send_at_command("AT+HTTPTERM"); 
-//    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-//
-//    // --- ???? HTTP ---
-//    uart_buffer_reset(); send_at_command("AT+HTTPINIT");
-//    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-//
-//    // --- ?????? ?????? GPRS ---
-//    uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"CID\",1");
-//    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-////    
+    uart_buffer_reset(); send_at_command("AT+HTTPTERM");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+
+    // --- ???? HTTP ---
+    uart_buffer_reset(); send_at_command("AT+HTTPINIT");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+
+    // --- ?????? ?????? GPRS ---
+    uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"CID\",1");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+
+    //http_connect();
+    glcd_clear();
+    glcd_outtextxy(0, 0, "test 1");
+////
     // --- ÊäÙíã URL ---
     uart_buffer_reset();
     //sprintf(full_url, "%s?phone_number=%s", base_url, phone_number);
-    snprintf(full_url, sizeof(full_url), 
-             "%s?phone_number=%s", 
-             base_url, phone_number);  
-             
+    snprintf(full_url, sizeof(full_url), "%s?ph=%s", base_url, phone_number);
+
+    glcd_clear();
+    glcd_outtextxy(0, 0, full_url);
+
     sprintf(cmd, "AT+HTTPPARA=\"URL\",\"%s\"", full_url);
     uart_buffer_reset(); send_at_command(cmd);
     (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
 
+    glcd_clear();
+    glcd_outtextxy(0, 0, buffer);
+
+
     // --- ????? ??????? GET ---
     uart_buffer_reset(); send_at_command("AT+HTTPACTION=0"); // 0=GET
-    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 10000, "HTTPACTION")) {
+    if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "HTTPACTION")) {
         if (extract_field_after_keyword(buffer, "+HTTPACTION:", 1, value, sizeof(value))) {
             if(atoi(value) == 200) return 1;
-        } 
+        }
 
-    } 
-    
-    //return (atoi(value) == 200) ? 1 : 0; 
+
+    }
+
+    glcd_clear();
+    glcd_outtextxy(0, 0, buffer);
+    delay_ms(500);
+
+    //return (atoi(value) == 200) ? 1 : 0;
     return 0;
 }
 
@@ -405,8 +434,10 @@ void handle_sms(void)
 {
 //    char tmp[2];
     char normalized_sms[100];
+    const char* server_url_get = "http://185.8.173.17:8080/home/get/";
     const char* server_url_post = "http://185.8.173.17:8080/home/post/";
     int product_id = 3;
+    int device_id = 1;
     int timeout_counter = 0;
     char key_pressed;
     char *tok, phone[32];
@@ -415,7 +446,7 @@ void handle_sms(void)
     if (tok) strcpy(phone, tok);
     else    strcpy(phone, "unknown");
 
-    normalize_digits_auto(content_buffer, normalized_sms, sizeof(normalized_sms)); 
+    normalize_digits_auto(content_buffer, normalized_sms, sizeof(normalized_sms));
 
     glcd_clear();
     glcd_outtextxy(0,0,"SMS from:");
@@ -425,25 +456,24 @@ void handle_sms(void)
     delay_ms(200);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-    
+    send_data(server_url_post, phone, product_id, device_id);
 //    if (strcmp(content_buffer, "1") == 0 || strcmp(content_buffer, "2") == 0 || strcmp(content_buffer, "3") == 0)
     if (strcmp(normalized_sms, "1") == 0 || strcmp(normalized_sms, "2") == 0 || strcmp(normalized_sms, "3") == 0)
-    {   
+    {
 //        product_id = 1;
 //        device_id = 1;
 //        send_data(server_url_post, phone, product_id, device_id);
         //send_data(server_url_post, phone, product_id, device_id);
-        if (get_data(server_url_post, phone))
+        if (get_data(server_url_get, phone))
         {
-            glcd_clear();                            
-            
+            glcd_clear();
             draw_bitmap(0, 0, adad_ra_vared_namaeid, 128, 64);
-            draw_bitmap(0, 32, square, 128, 32); 
+            draw_bitmap(0, 32, square, 128, 32);
             //glcd_outtextxy(64, 42, content_buffer);
             glcd_outtextxy(64, 42, normalized_sms);
-            
-//            BUZER_PORT |= (1 << BUZER_PIN); 
-//            delay_ms(50); 
+
+//            BUZER_PORT |= (1 << BUZER_PIN);
+//            delay_ms(50);
 //            BUZER_PORT &= ~(1 << BUZER_PIN);
 
             key_pressed = 0;
@@ -467,14 +497,15 @@ void handle_sms(void)
                 {
                     glcd_clear();
 //                    glcd_outtextxy(5, 25, "test 3!");
-//                    delay_ms(300); 
+//                    delay_ms(300);
                     product_id = normalized_sms[0] - '0';
                     activate_motor(product_id);
 //                    glcd_clear();
                     draw_bitmap(0, 32, mahsol_ra_bardarid, 128, 32);
-//                    BUZER_PORT |= (1 << BUZER_PIN); 
-//                    delay_ms(100); 
+//                    BUZER_PORT |= (1 << BUZER_PIN);
+//                    delay_ms(100);
 //                    BUZER_PORT &= ~(1 << BUZER_PIN);
+                    get_data(server_url_get, phone);
                     send_data(server_url_post, phone, product_id, device_id);
                 }
                 else
@@ -500,7 +531,7 @@ void handle_sms(void)
         glcd_clear();
         draw_bitmap(0, 0, shomare_dorost_payamak_nashode, 128, 64);
         delay_ms(200);
-        
+
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -655,7 +686,7 @@ void main(void)
     // Global enable interrupts
     #asm("sei")
 
-                
+
     //buzzer(100);
 
     glcd_clear();
@@ -669,27 +700,27 @@ void main(void)
 
     while (1){
         static uint8_t processing_sms = 0;
-        draw_bitmap(0, 0, kode_mahsol_payamak_konid, 128, 64); 
+        draw_bitmap(0, 0, kode_mahsol_payamak_konid, 128, 64);
         //test_keypad();
-        process_uart_data(); 
-        
+        process_uart_data();
+
         if (sms_received) {
             processing_sms = 1;   // ÔÑæÚ ÑÏÇÒÔ íÇã˜
             handle_sms();
             //http_close();
             processing_sms = 0;   // ÇíÇä ÑÏÇÒÔ íÇã˜
-            uart_buffer_reset(); 
-            glcd_clear();
-        } 
-        
-        if (!processing_sms && (millis() - last_time > 50000)) {
-            if (checking()) {
-                http_keep_alive();   // ??? ??? ????? ???? ???
-            }
-            last_time = millis();
             uart_buffer_reset();
             glcd_clear();
         }
+
+//        if (!processing_sms && (millis() - last_time > 50000)) {
+//            if (checking()) {
+//                http_keep_alive();   // ??? ??? ????? ???? ???
+//            }
+//            last_time = millis();
+//            uart_buffer_reset();
+//            glcd_clear();
+//        }
 
     }
 }

@@ -395,11 +395,11 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
     }
 
 
-    glcd_clear();
-    glcd_outtextxy(0, 0, buffer);
-    glcd_outtextxy(0, 10, value);
-
-    delay_ms(500);
+//    glcd_clear();
+//    glcd_outtextxy(0, 0, buffer);
+//    glcd_outtextxy(0, 10, value);
+//
+//    delay_ms(500);
 
     if(strlen(re) < 6 && product_id < 0){
         glcd_clear();

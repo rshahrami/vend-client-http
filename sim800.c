@@ -293,31 +293,37 @@ uint8_t checking(void)
 
     glcd_clear();
     glcd_outtextxy(0, 0, "Checking ...");
+
     // 0) AT ????
     uart_buffer_reset(); send_at_command("AT");
     if (!read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK")) {
-        //glcd_outtextxy(0, 0, "No AT -> Reboot");
+//        glcd_outtextxy(0, 0, "No AT -> Reboot");
+//        delay_ms(300);
         //sim800_restart();
         bringup_gprs_and_sms();
         return 0;
     }
 
+    glcd_outtextxy(0, 10, "step 1");
     // 1) ????? attach
     uart_buffer_reset(); send_at_command("AT+CGATT?");
     if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+CGATT:")) {
         if (extract_field_after_keyword(buffer, "+CGATT:", 0, value, sizeof(value))) {
             if (atoi(value) != 1) {
-                //glcd_outtextxy(0, 0, "CGATT=0 -> Recover");
+//                glcd_outtextxy(0, 0, "CGATT=0 -> Recover");
+//                delay_ms(300);
                 bringup_gprs_and_sms();
                 return 0;
             }
         }
     } else {
-        //glcd_outtextxy(0, 0, "CGATT? timeout");
+//        glcd_outtextxy(0, 0, "CGATT? timeout");
+//        delay_ms(300);
         bringup_gprs_and_sms();
         return 0;
     }
 
+//    glcd_outtextxy(0, 10, "step 2");
     // 2) ????? bearer (SAPBR)
     uart_buffer_reset(); send_at_command("AT+SAPBR=2,1");
     if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+SAPBR:")) {
@@ -334,17 +340,23 @@ uint8_t checking(void)
                 if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+SAPBR:") &&
                     extract_field_after_keyword(buffer, "+SAPBR:", 1, value, sizeof(value)) &&
                     atoi(value) == 1) {
+                    uart_buffer_reset(); send_at_command("ATE0");
+                    read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK");
+                    http_connect();
+                    init_sms();
                     return 1; // ok ??? keep-alive ????? ???
                 }
 
-                //glcd_outtextxy(0, 0, "Bearer fail -> Recover");
+//                glcd_outtextxy(0, 0, "Bearer fail -> Recover");
+//                delay_ms(300);
                 bringup_gprs_and_sms();
                 return 0;
             }
             // ???????: IP ?? ?? ?? ???? ?? 0.0.0.0 ?????
             if (extract_field_after_keyword(buffer, "+SAPBR:", 2, value, sizeof(value))) {
                 if (strstr(value, "0.0.0.0")) {
-                    //glcd_outtextxy(0, 0, "No IP -> Recover");
+//                    glcd_outtextxy(0, 0, "No IP -> Recover");
+//                    delay_ms(300);
                     bringup_gprs_and_sms();
                     return 0;
                 }
@@ -353,8 +365,10 @@ uint8_t checking(void)
         }
     }
     attempts=0;
+
     // ??? ???? ???/???????? ??
-    //glcd_outtextxy(0, 0, "SAPBR? timeout -> Recover");
+//    glcd_outtextxy(0, 0, "SAPBR? timeout -> Recover");
+//    delay_ms(300);
     bringup_gprs_and_sms();
     return 0;
 }

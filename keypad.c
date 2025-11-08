@@ -97,7 +97,7 @@ unsigned char get_number_from_keypad(char *buffer_key)
     char key;
 
     glcd_clear();
-    glcd_outtextxy(0, 0, "Operator MOD");
+    glcd_outtextxy(0, 0, "Operator MODE");
     glcd_outtextxy(0, 12, "(# cl - *** can)");
     glcd_outtextxy(0, 30, ""); // ÎØ ÈÚÏí ÈÑÇí ÚÏÏåÇ
 
@@ -116,7 +116,7 @@ unsigned char get_number_from_keypad(char *buffer_key)
             sep_count = 0;
             buffer_key[0] = '\0';
             glcd_clear();
-            glcd_outtextxy(0, 0, "Operator MOD");
+            glcd_outtextxy(0, 0, "Operator MODE");
             glcd_outtextxy(0, 12, "(# cl- *** can)");
             glcd_outtextxy(0, 30, "");
             continue;

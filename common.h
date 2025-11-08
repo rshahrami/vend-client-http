@@ -7,6 +7,8 @@
 
 #define BUFFER_SIZE 256
 
+
+void buzzer(uint8_t timeout_ms);
 // --- ÊæÇÈÚ UART / AT ---
 void send_at_command(char *command);
 //void uart_flush0(void);

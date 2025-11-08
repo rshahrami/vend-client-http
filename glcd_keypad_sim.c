@@ -64,8 +64,6 @@ uint32_t next_keepalive_at = 0;
 #define REPOSRT_PIN 4
 
 
-#define BUZER_PORT PORTF
-#define BUZER_PIN 1
 
 
 //char ip_address_buffer[16];
@@ -389,7 +387,7 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
             if (atoi(value) == 204) {
                 glcd_clear();
                 draw_bitmap(0, 0, sahmiye_tamam, 128, 64);
-                delay_ms(150);
+                delay_ms(300);
                 return 0;
             }
             if (atoi(value) == 201) return 1;
@@ -401,7 +399,7 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
         glcd_clear();
         //glcd_rectrel(0,0,128,64);
         draw_bitmap(0, 0, talash_mojadad, 128, 64);
-        delay_ms(150);
+        delay_ms(300);
     }
 
 //    glcd_clear();
@@ -452,12 +450,10 @@ void handle_sms(void)
             glcd_setlinestyle(2,GLCD_LINE_SOLID);
             glcd_line(0,32,128,32);
             glcd_circle(64, 48, 16);
-            glcd_outtextxy(64, 42, normalized_sms);
+            glcd_outtextxy(62, 41, normalized_sms);
             glcd_setfont(font5x7);
 
-//            BUZER_PORT |= (1 << BUZER_PIN);
-//            delay_ms(80);
-//            BUZER_PORT &= ~(1 << BUZER_PIN);
+            //buzzer(100);
 
             key_pressed = 0;
             for (timeout_counter = 0; timeout_counter < 200; timeout_counter++)
@@ -475,20 +471,7 @@ void handle_sms(void)
             }
             else
             {
-//                glcd_clear();
-//                tmp[0] = content_buffer[0];
-//                tmp[1] = '\0';
-//                glcd_outtextxy(5, 25, tmp);
-//
-//                // äãÇíÔ key_pressed
-//                tmp[0] = key_pressed;
-//                tmp[1] = '\0';
-//                glcd_outtextxy(5, 45, tmp);
-//                delay_ms(1000);
-                // æÞÊí ˜áíÏåÇ 0..9 Èå ÕæÑÊ ÚÏÏ ÈÑãíÑÏä
-//                if (key_pressed >= 0 && key_pressed <= 9) {
-//                    key_pressed = '0' + key_pressed;   // ÊÈÏíá Èå ˜ÇÑÇ˜ÊÑ '0'..'9'
-//                }
+
                 if (key_pressed == normalized_sms[0])
                 {
                     glcd_clear();
@@ -500,15 +483,13 @@ void handle_sms(void)
                     glcd_clear();
                     draw_bitmap(0, 0, mahsol_ra_bardarid, 128, 64);
 
-//                    BUZER_PORT |= (1 << BUZER_PIN);
-//                    delay_ms(100);
-//                    BUZER_PORT &= ~(1 << BUZER_PIN);
+//                    buzzer(100);
 
 //                    send_data(server_url_post, phone, product_id, device_id);
                     //send_data(phone, device_id, product_id);
                     get_data(phone, product_id, device_id, "0");
 
-                    delay_ms(150);
+                    //delay_ms(150);
                 }
                 else
                 {
@@ -706,29 +687,14 @@ void main(void)
     glcd_init(&glcd_init_data);
     glcd_setfont(font5x7);
 
-//    glcd_setlinestyle(int thickness, int style);  // ÇÓÊÇíá ÎØ
-//    glcd_line(int x1, int y1, int x2, int y2); // ÎØ ÕÇÝ
-
-
-
-//    glcd_circle(int x, int y, int radius);
-    //glcd_rectrel(x, y, width, height);
-//    glcd_setfont(arial_bold14);
-
     // Global enable interrupts
     #asm("sei")
 
-//    BUZER_PORT |= (1 << BUZER_PIN);
-//    delay_ms(100);
-//    BUZER_PORT &= ~(1 << BUZER_PIN);
-
+    //buzzer(100);
     glcd_clear();
-//    glcd_outtextxy(0, 0, "Module Init...");
-//    delay_ms(150);
 
     sim800_restart();
     bringup_gprs_and_sms();
-
 
     glcd_clear();
 
@@ -747,13 +713,7 @@ void main(void)
                 get_data("0", -1, device_id, number_str);
             }
             glcd_clear();
-            //glcd_outtextxy(0, 0, number_str);
-
         }
-
-
-        //number = atoi(number_str);
-
 
 
         // UI + UART processing
@@ -764,9 +724,7 @@ void main(void)
         // Handle incoming SMS (blocking)
         if (sms_received) {
             processing_sms = 1;
-//            BUZER_PORT |= (1 << BUZER_PIN);
-//            delay_ms(100);
-//            BUZER_PORT &= ~(1 << BUZER_PIN);
+//            buzzer(100);
             handle_sms();
             sms_received = 0;
             processing_sms = 0;

@@ -8,6 +8,11 @@
 #define glcd_pixel(x, y, color) glcd_setpixel(x, y)
 #define read_flash_byte(p) (*(p))
 
+
+
+#define BUZER_PORT PORTF
+#define BUZER_PIN 1
+
 /*
 «Ì—«‰”·   mtnirancell
 Â„—«Â «Ê·      mcinet
@@ -22,6 +27,12 @@ int device_id = 7653;
 
 //uint8_t app_had_traffic_since_last_check = 0;
 
+void buzzer(uint8_t timeout_ms){
+
+    BUZER_PORT |= (1 << BUZER_PIN);
+    delay_ms(timeout_ms);
+    BUZER_PORT &= ~(1 << BUZER_PIN);
+}
 
 // --- C??C? I?E?? AT ---
 void send_at_command(char *command)
@@ -29,21 +40,6 @@ void send_at_command(char *command)
     printf("%s\r\n", command);
 }
 
-// --- ?C? ??I? EC?? USART0 ---
-//void uart_flush0(void)
-//{
-//    unsigned char dummy;
-//
-//    // ?C? ??I? ????E? ?IE?C??C??
-//    while (UCSR0A & (1<<RXC0)) {
-//        dummy = UDR0;
-//    }
-////
-////    // ?C? ??I? EC?? ????C??C??
-////    rx_wr_index0 = rx_rd_index0 = 0;
-////    rx_counter0 = 0;
-////    rx_buffer_overflow0 = 0;
-//}
 
 
 void uart_buffer_reset(void) {
@@ -51,9 +47,6 @@ void uart_buffer_reset(void) {
     rx_counter0 = 0;
     rx_buffer_overflow0 = 0;
 }
-
-
-
 
 
 // E?E??? ECE? E?C? C?? ?C?

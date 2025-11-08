@@ -369,8 +369,8 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
 //    itoa(len, len_str);
 //    glcd_outtextxy(0, 10, len_str);
 
-    glcd_clear();
-    glcd_outtextxy(0, 0, cmd);
+//    glcd_clear();
+//    glcd_outtextxy(0, 0, cmd);
     //strcpy(buf, main_url);
 //    glcd_outtextxy(0, 20, main_url);
 //    delay_ms(300);
@@ -392,6 +392,7 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
                 delay_ms(150);
                 return 0;
             }
+            if (atoi(value) == 201) return 1;
         }
     }
 
@@ -742,8 +743,9 @@ void main(void)
         if (read_button_debounced())
         {
 
-            get_number_from_keypad(number_str);
-            get_data("0", -1, device_id, number_str);
+            if(get_number_from_keypad(number_str)){
+                get_data("0", -1, device_id, number_str);
+            }
             glcd_clear();
             //glcd_outtextxy(0, 0, number_str);
 

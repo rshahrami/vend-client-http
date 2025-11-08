@@ -24,7 +24,7 @@ char get_key(void)
 //    };
 
     const char key_map[4][3] = {
-        {'#', '0', '*'},  // ÑÏíİ 1
+        {'*', '0', '#'},  // ÑÏíİ 1
         {'9', '8', '7'},  // ÑÏíİ 2
         {'6', '5', '4'},  // ÑÏíİ 3
         {'3', '2', '1'}   // ÑÏíİ 4
@@ -90,7 +90,7 @@ void test_keypad(void)
 //}
 
 
-void get_number_from_keypad(char *buffer_key)
+unsigned char get_number_from_keypad(char *buffer_key)
 {
     unsigned int i = 0;
     unsigned char sep_count = 0;
@@ -98,7 +98,7 @@ void get_number_from_keypad(char *buffer_key)
 
     glcd_clear();
     glcd_outtextxy(0, 0, "Operator MOD");
-    glcd_outtextxy(0, 12, "(* cl - ### can)");
+    glcd_outtextxy(0, 12, "(# cl - *** can)");
     glcd_outtextxy(0, 30, ""); // ÎØ ÈÚÏí ÈÑÇí ÚÏÏåÇ
 
     buffer_key[0] = '\0';
@@ -110,14 +110,14 @@ void get_number_from_keypad(char *buffer_key)
             continue;
 
         // Ç˜ ˜ÑÏä ÈÇİÑ ÈÇ *
-        if (key == '*')
+        if (key == '#')
         {
             i = 0;
             sep_count = 0;
             buffer_key[0] = '\0';
             glcd_clear();
             glcd_outtextxy(0, 0, "Operator MOD");
-            glcd_outtextxy(0, 12, "(* cl- ### can)");
+            glcd_outtextxy(0, 12, "(# cl- *** can)");
             glcd_outtextxy(0, 30, "");
             continue;
         }
@@ -135,30 +135,30 @@ void get_number_from_keypad(char *buffer_key)
         }
 
         // ÌÏÇ˜ääÏå #
-        if (key == '#')
+        if (key == '*')
         {
             if (i == 0) continue; // ÑÔÊå ÎÇáí¡ ˜ÇÑí ä˜ä
 
             if (i < (MAX_TOTAL_LEN - 2))
             {
-                buffer_key[i++] = '#';
+                buffer_key[i++] = '*';
                 buffer_key[i] = '\0';
                 sep_count++;
                 glcd_outtextxy(0, 30, buffer_key);
 
                 // ÇÑ Óå # ÔÊ ÓÑ åã ÈÏæä ÚÏÏ ÈíäÔÇä ? áÛæ
-                if (i >= 3 && buffer_key[i-1] == '#' && buffer_key[i-2] == '#' && buffer_key[i-3] == '#')
+                if (i >= 3 && buffer_key[i-1] == '*' && buffer_key[i-2] == '*' && buffer_key[i-3] == '*')
                 {
                     buffer_key[0] = '\0'; // Ç˜ ˜ÑÏä ÈÇİÑ
                     glcd_clear();
                     glcd_outtextxy(0, 0, "Canceled!");
-                    delay_ms(500);
-                    return;
+                    delay_ms(250);
+                    return 0;
                 }
 
                 // ÇÑ Óå # ÈÇ ÚÏÏ ÈíäÔÇä ? ÏÇÏå ˜Çãá
                 if (sep_count >= 3)
-                    return;
+                    return 1;
             }
             continue;
         }

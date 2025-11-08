@@ -20,7 +20,7 @@
 char get_key(void);
 void test_keypad(void);
 //void get_number_from_keypad(char *buffer_key);
-void get_number_from_keypad(char *buffer_key);
+unsigned char get_number_from_keypad(char *buffer_key);
 
 //uint8_t get_number_from_keypad_timeout(char *out_buf, unsigned long timeout_ms, uint8_t required_hashes);
 

@@ -18,7 +18,7 @@ OutputListFilesDirectory=Release\List
 OutputObjectFilesDirectory=Release
 OutputExecutableFilesDirectory=Release\Exe
 OutputLinkerFilesDirectory=Release\Exe
-AllowDisplayFunctionCallTree=0
+AllowDisplayFunctionCallTree=1
 CleanUp=2
 EditorPanelMode=1
 ActiveEditorPanel=0
@@ -26,42 +26,42 @@ Active0=0
 EditorPanel0=0
 PageIndex0=0
 EditorPanel1=0
-TimeStamp1=1533379833
+TimeStamp1=1533707590
 PageIndex1=1
 OF2=sim800.c
 Active2=0
 EditorPanel2=0
-TimeStamp2=1532993669
+TimeStamp2=1533696796
 PageIndex2=2
 OF3=sim800.h
 Active3=0
 EditorPanel3=0
-TimeStamp3=1532037850
+TimeStamp3=1533696796
 PageIndex3=3
 OF4=common.c
 Active4=0
 EditorPanel4=0
-TimeStamp4=1532070517
+TimeStamp4=1533696796
 PageIndex4=4
 OF5=common.h
 Active5=0
 EditorPanel5=0
-TimeStamp5=1532037839
+TimeStamp5=1533696796
 PageIndex5=5
 OF6=keypad.c
 Active6=0
 EditorPanel6=0
-TimeStamp6=1533377852
+TimeStamp6=1533696796
 PageIndex6=6
 OF7=keypad.h
 Active7=0
 EditorPanel7=0
-TimeStamp7=1533375325
+TimeStamp7=1533696796
 PageIndex7=7
 OF8=bitmaps.h
 Active8=0
 EditorPanel8=0
-TimeStamp8=1532037818
+TimeStamp8=1533696796
 PageIndex8=8
 OF9=bitmaps.h
 Active9=0
@@ -176,8 +176,8 @@ WatchAVR8LAutoVariables=0
 UseEEPROMLocation0=1
 RebuildAll=0
 LinkageInformationPresent=1
-COFFileTimeStamp=1533576962
-Build=342
+COFFileTimeStamp=1533707593
+Build=343
 [DefinedSymbolsDebug]
 Count=0
 [Compiler]
@@ -279,7 +279,7 @@ UseEEPROMLocation0=1
 RebuildAll=1
 LinkageInformationPresent=0
 COFFileTimeStamp=-1
-Build=342
+Build=343
 IncludePath0=
 IncludePath1=
 IncludePath2=
@@ -553,7 +553,7 @@ L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
 L17=Build: 342
-L18=35121 line(s) compiled
+L18=35139 line(s) compiled
 L19=No errors
 L20=3 warning(s)
 L21=
@@ -564,30 +564,30 @@ L25=Data Stack area: 0x100 to 0x4FF
 L26=Data Stack size: 1024 byte(s)
 L27=Estimated Data Stack usage: 166 byte(s)
 L28=
-L29=RAM Global variables area: 0x500 to 0xC60
-L30=RAM Global variables size: 1889 byte(s)
+L29=RAM Global variables area: 0x500 to 0xC2F
+L30=RAM Global variables size: 1840 byte(s)
 L31=
-L32=Hardware Stack area: 0xC61 to 0x10FF
-L33=Hardware Stack size: 1183 byte(s)
+L32=Hardware Stack area: 0xC30 to 0x10FF
+L33=Hardware Stack size: 1232 byte(s)
 L34=
 L35=Heap size: 0 byte(s)
 Lines=39
 L36=
 L37=EEPROM usage: 0 byte(s), 0.0% of EEPROM
-L38=Program size: 12287 words (24574 bytes), 37.5% of FLASH
-L39=899 words (1798 bytes), 6.8% reduced by Code Compression
+L38=Program size: 12352 words (24704 bytes), 37.7% of FLASH
+L39=924 words (1848 bytes), 7.0% reduced by Code Compression
 [BuildInfoAssembler]
 Lines=12
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=C:\Users\reza\Downloads\New folder (12)\vending-2.6.0 (1)\vending-2.6.0\Debug\List\glcd_keypad_sim.asm(12399): No EEPROM data, deleting C:\Users\reza\Downloads\New folder (12)\vending-2.6.0 (1)\vending-2.6.0\Debug\Exe\glcd_keypad_sim.eep
+L4=E:\projects\vending\vend-client-http\Debug\List\glcd_keypad_sim.asm(12490): No EEPROM data, deleting E:\projects\vending\vend-client-http\Debug\Exe\glcd_keypad_sim.eep
 L5=
 L6=ATmega64A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x005ffe  13370  11204  24574   65536  37.5%
-L10=[.dseg] 0x000100 0x000c61      0   1889   1889    4096  46.1%
+L9=[.cseg] 0x000000 0x006080  13520  11184  24704   65536  37.7%
+L10=[.dseg] 0x000100 0x000c30      0   1840   1840    4096  44.9%
 L11=[.eseg] 0x000000 0x000000      0      0      0    2048   0.0%
 L12=
 [BookmarksFoldedCode]
@@ -617,7 +617,7 @@ F22=E:\codeVision\inc\stdio.h
 F23=E:\codeVision\inc\stdarg.h
 F24=arial_bold14.h
 [Bookmarks1]
-TimeStamp=1532037818
+TimeStamp=1533696796
 Row=0
 Column=0
 ScrollPosX=0
@@ -655,13 +655,13 @@ Row=0
 Column=0
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1533382011
+TimeStamp=1533708870
 [Bookmarks3]
-TimeStamp=1533379833
-Row=32
-Column=2
+TimeStamp=1533707590
+Row=762
+Column=20
 ScrollPosX=0
-ScrollPosY=12
+ScrollPosY=749
 BK0=-1
 BK1=-1
 BK2=-1
@@ -709,11 +709,11 @@ BK9=-1
 [FoldedCode5]
 Blocks=0
 [Bookmarks6]
-TimeStamp=1532037839
+TimeStamp=1533696796
 Row=0
 Column=0
 ScrollPosX=0
-ScrollPosY=10
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -725,11 +725,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks7]
-TimeStamp=1532070517
-Row=17
-Column=120
+TimeStamp=1533696796
+Row=0
+Column=0
 ScrollPosX=0
-ScrollPosY=12
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -795,11 +795,11 @@ BK9=-1
 [FoldedCode10]
 Blocks=0
 [Bookmarks11]
-TimeStamp=1533377852
-Row=154
-Column=20
+TimeStamp=1533696796
+Row=0
+Column=0
 ScrollPosX=0
-ScrollPosY=133
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -811,11 +811,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks12]
-TimeStamp=1533375325
-Row=22
-Column=46
+TimeStamp=1533696796
+Row=0
+Column=0
 ScrollPosX=0
-ScrollPosY=6
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -913,9 +913,9 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks18]
-TimeStamp=1532037850
-Row=22
-Column=28
+TimeStamp=1533696796
+Row=0
+Column=0
 ScrollPosX=0
 ScrollPosY=0
 BK0=-1
@@ -931,11 +931,11 @@ BK9=-1
 [FoldedCode17]
 Blocks=0
 [Bookmarks19]
-TimeStamp=1532993669
-Row=273
-Column=40
+TimeStamp=1533696796
+Row=14
+Column=9
 ScrollPosX=0
-ScrollPosY=259
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -1028,22 +1028,6 @@ BK8=-1
 BK9=-1
 [FoldedCode23]
 Blocks=0
-[FoldedCode3]
-Blocks=0
-[FoldedCode7]
-Blocks=0
-[FoldedCode11]
-Blocks=0
-[FoldedCode19]
-Blocks=0
-[FoldedCode1]
-Blocks=0
-[FoldedCode12]
-Blocks=0
-[FoldedCode6]
-Blocks=0
-[FoldedCode18]
-Blocks=0
 [Bookmarks24]
 TimeStamp=1053182452
 Row=19
@@ -1064,10 +1048,10 @@ BK9=-1
 Blocks=0
 [HeadersList]
 Files=4
-F1=C:\Users\reza\Downloads\New folder (12)\vending-2.6.0 (1)\vending-2.6.0\glcd_keypad_sim.c
-F2=C:\Users\reza\Downloads\New folder (12)\vending-2.6.0 (1)\vending-2.6.0\common.c
-F3=C:\Users\reza\Downloads\New folder (12)\vending-2.6.0 (1)\vending-2.6.0\keypad.c
-F4=C:\Users\reza\Downloads\New folder (12)\vending-2.6.0 (1)\vending-2.6.0\sim800.c
+F1=E:\projects\vending\vend-client-http\glcd_keypad_sim.c
+F2=E:\projects\vending\vend-client-http\common.c
+F3=E:\projects\vending\vend-client-http\keypad.c
+F4=E:\projects\vending\vend-client-http\sim800.c
 [Header1]
 Files=22
 F1=E:\codeVision\inc\mega64a.h
@@ -1143,3 +1127,19 @@ F13=E:\codeVision\inc\stdio.h
 F14=E:\codeVision\inc\io.h
 F15=E:\codeVision\inc\stdarg.h
 F16=sim800.h
+[FoldedCode3]
+Blocks=0
+[FoldedCode7]
+Blocks=0
+[FoldedCode11]
+Blocks=0
+[FoldedCode19]
+Blocks=0
+[FoldedCode1]
+Blocks=0
+[FoldedCode12]
+Blocks=0
+[FoldedCode6]
+Blocks=0
+[FoldedCode18]
+Blocks=0

@@ -12,13 +12,8 @@
 #define SIGNAL_CHECKS 5
 
 #define LOOP_CHECK 3
-//uint8_t site_counter = 0;
 
-
-//char value[16];
-
-//char at_command[60];
-//char sim_number[15];
+static char csq_char[25];
 
 //char buffer[BUFFER_SIZE];
 uint8_t attempts = 0;
@@ -83,7 +78,7 @@ void sim800_restart(void) {
         uart_buffer_reset(); send_at_command("AT+CFUN=1,1");
         read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK"); // (E??I?? C?? ??C?I)
         //glcd_outtextxy(0, 10, "Rebooting, AT ...");
-        while (attemptss<5) {
+        while (attemptss<LOOP_CHECK) {
             uart_buffer_reset();
             send_at_command("AT");
             if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK")) {
@@ -136,7 +131,7 @@ unsigned char check_sim(void) {
     }
     attempts=0;
     glcd_clear();
-    glcd_outtextxy(0, 0, "> Network  OK!");
+    glcd_outtextxy(0, 0, "> N    OK!");
 
     //delay_ms(50);
 
@@ -155,8 +150,9 @@ unsigned char check_signal_quality(void)
             if (extract_field_after_keyword(buffer, "+CSQ:", 0, value, sizeof(value))) {
                 csq = atoi(value);
                 if (csq == 99) return 0;
-                if (csq < 5) return 0;
-                glcd_outtextxy(0, 12, "> Quality  OK!");
+                if (csq < 5) return 0;               
+                snprintf(csq_char, sizeof(csq_char), "> Q %d OK!", csq);
+                glcd_outtextxy(0, 12, csq_char);
 
                 return 1;
             }
@@ -204,8 +200,8 @@ unsigned char init_GPRS(void)
 //                        glcd_clear();
 //                        glcd_outtextxy(0, 0, value);
 //                        delay_ms(300);
-
-                        glcd_outtextxy(0, 22, "> GPRS     OK!");
+                                              
+                        glcd_outtextxy(0, 22, "> G    OK!");
 
                         return 1; // ????
                     }
@@ -217,7 +213,7 @@ unsigned char init_GPRS(void)
 
     attempts=0;
     glcd_clear();
-    glcd_outtextxy(0, 0, "No IP");
+    glcd_outtextxy(0, 0, "No G");
     return 0; // ??????
 }
 
@@ -233,8 +229,8 @@ void http_connect(void)
 
     uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"CID\",1");
     (void)read_until_keyword_keep_all(buffer, sizeof(buffer), 2000, "OK");
-
-    glcd_outtextxy(0, 32, "> HTTP     OK!");
+                          
+    glcd_outtextxy(0, 32, "> H    OK!");
 
 
 
@@ -254,8 +250,8 @@ unsigned char init_sms(void)
     send_at_command("AT+CNMI=2,2,0,0,0");      (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 100, "OK");
 
     send_at_command("AT+CMGDA=\"DEL ALL\"");   (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 100, "OK");
-
-    glcd_outtextxy(0, 42, "> SMS      OK!");
+                          
+    glcd_outtextxy(0, 42, "> S    OK!");
 
     delay_ms(200);
     return 1;
@@ -304,7 +300,7 @@ uint8_t checking(void)
         return 0;
     }
 
-    glcd_outtextxy(0, 10, "step 1");
+//    glcd_outtextxy(0, 10, "step 1");
     // 1) ????? attach
     uart_buffer_reset(); send_at_command("AT+CGATT?");
     if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+CGATT:")) {
@@ -375,8 +371,8 @@ uint8_t checking(void)
 
 
 void http_keep_alive(void) {
-    glcd_clear();
-    glcd_outtextxy(0, 0, "Keep_Alive ...");
+//    glcd_clear();
+//    glcd_outtextxy(0, 0, "Keep_Alive ...");
 
     uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"URL\",\"http://www.google.com\"");
     (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK");
@@ -385,14 +381,5 @@ void http_keep_alive(void) {
     uart_buffer_reset(); send_at_command("AT+HTTPACTION=2"); // 0=GET
     (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK");
 
-//    if(site_counter==0)
-//        uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"URL\",\"http://www.google.com\"");
-//        (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK");
-//    if(site_counter==1)
-//        uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"URL\",\"http://www.google.com\"");
-//        (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK");
-//    if(site_counter==2)
-//        uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"URL\",\"http://www.google.com\"");
-//        (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK");
 
 }

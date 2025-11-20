@@ -286,7 +286,7 @@ void normalize_digits_auto(const char *in, char *out, size_t outsz){
 void activate_motor(int product_id)
 {
     unsigned char motor_pin;
-    char motor_msg[20];
+//    char motor_msg[20];
     int timeout = 1000;
 
     switch (product_id)
@@ -297,9 +297,9 @@ void activate_motor(int product_id)
         default: return;
     }
 
-    sprintf(motor_msg, "MOTOR %d ON!", product_id);
-    glcd_clear();
-    glcd_outtextxy(10, 20, motor_msg);
+//    sprintf(motor_msg, "MOTOR %d ON!", product_id);
+//    glcd_clear();
+//    glcd_outtextxy(10, 20, motor_msg);
     MOTOR_PORT |= (1 << motor_pin);
 
     while (!(PIND & (1 << PIND1)) && timeout > 0)
@@ -312,7 +312,7 @@ void activate_motor(int product_id)
 //    glcd_clear();
 //    glcd_outtextxy(10, 20, motor_msg);
 
-    glcd_clear();
+//    glcd_clear();
 //    draw_bitmap(0, 0, mahsol_ra_bardarid, 128, 64);
 //    delay_ms(80);
 }
@@ -437,12 +437,12 @@ void handle_sms(void)
     // ---  »œÌ· «—ﬁ«„ ›«—”Ì UCS2 »Â «‰ê·Ì”Ì ---
     normalize_digits_auto(content_buffer, normalized_sms, sizeof(normalized_sms));
 
-    glcd_clear();
-    glcd_outtextxy(0,0,"SMS from:");
-    glcd_outtextxy(0,10,phone);
-    //glcd_outtextxy(0,20,content_buffer);
-    glcd_outtextxy(0,20,normalized_sms);
-    delay_ms(250);
+//    glcd_clear();
+//    glcd_outtextxy(0,0,"SMS from:");
+//    glcd_outtextxy(0,10,phone);
+//    //glcd_outtextxy(0,20,content_buffer);
+//    glcd_outtextxy(0,20,normalized_sms);
+//    delay_ms(250);
 
 
     if (strcmp(normalized_sms, "1") == 0 || strcmp(normalized_sms, "2") == 0 || strcmp(normalized_sms, "3") == 0)

@@ -25,13 +25,13 @@ volatile unsigned long millis_counter = 0;
 //#define APN "mcinet" // APN C??CE?? I?I ?C ?C?I ???I
 //const char APN[] = "mcinet";
 
-//unsigned long last_time_health = 0;
+unsigned long last_time_health = 0;
 //unsigned long last_time_ping = 0;
 
 
 //static const char main_url[] = "http://vendmylady.ir/home";
-static char main_url[] = "http://vendmylady.ir/home";
-static char auth_header[] = "2035de5353da75d3f6d5018c1259598124e1d6dd";
+static char main_url[] = "http://vendmylady.ir:81/home";
+static char auth_header[] = "06ed27f81ead73828cba735ea2043dd8bda60f0f";
 static char full_url[80];
 static char cmd[120];
 
@@ -48,7 +48,7 @@ char number_str[10];
 
 //#define BUFFER_SIZE 512
 //#define HTTP_TIMEOUT_MS 5000
-#define KEEPALIVE_MS 10000
+#define KEEPALIVE_MS 20000
 uint32_t next_keepalive_at = 0;
 
 
@@ -323,7 +323,7 @@ void activate_motor(int product_id)
 unsigned char get_data(const char* phone_number, int product_id, int device_id, const char* re) {
 //    char full_url[255];
     int len;
-//    char len_str[10];
+    char len_str[10];
     //char buf[50];
 
     full_url[0] = '\0';
@@ -345,7 +345,7 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
                 "%s/re/?d=%d&re=%s",
                 main_url, device_id, re);
     }
-    else if(strlen(re) < 6 && product_id < 0 && !strcmp(phone_number, "0")){
+    else if(strlen(re) < 6 && product_id < 0 && strcmp(phone_number, "0")){
         glcd_clear();
         draw_bitmap(0, 0, lotfan_montazer_bemanid, 128, 64);
         len = snprintf(full_url, sizeof(full_url),
@@ -353,7 +353,8 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
                 main_url, phone_number);
     }
 
-    else if(strlen(re) < 6 && product_id < 0 && strcmp(phone_number, "0")){
+    else if(strlen(re) < 6 && product_id < 0 && !strcmp(phone_number, "0")){
+        
         len = snprintf(full_url, sizeof(full_url),
                 "%s/st/?d=%d",
                 main_url, device_id);
@@ -363,42 +364,43 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
 //    glcd_outtextxy(0, 0, len_str);
 
 
-    len = snprintf(cmd, sizeof(cmd), "AT+HTTPPARA=\"URL\",\"%s\"", full_url);
+    snprintf(cmd, sizeof(cmd), "AT+HTTPPARA=\"URL\",\"%s\"", full_url);
 //    itoa(len, len_str);
 //    glcd_outtextxy(0, 10, len_str);
 
 //    glcd_clear();
-//    glcd_outtextxy(0, 0, cmd);
+    glcd_outtextxy(0, 0, ".");
     //strcpy(buf, main_url);
 //    glcd_outtextxy(0, 20, main_url);
-//    delay_ms(300);
+    //delay_ms(100);
 
     uart_buffer_reset(); send_at_command(cmd);
-    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
-
-
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK");
 
     len = snprintf(cmd, sizeof(cmd),
                     "AT+HTTPPARA=\"USERDATA\",\"Authorization: Token %s\"",
                     auth_header);
     uart_buffer_reset(); send_at_command(cmd);
-    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1000, "OK");
+    (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK");
 
-
+//    glcd_outtextxy(0, 10, buffer);
     // ÏÑÎæÇÓÊ GET
     uart_buffer_reset(); send_at_command("AT+HTTPACTION=2"); // 0=GET
     if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 5000, "HTTPACTION")) {
+//        glcd_outtextxy(0, 10, buffer);  
+//        delay_ms(300);
         if (extract_field_after_keyword(buffer, "+HTTPACTION:", 1, value, sizeof(value))) {
-            if (atoi(value) == 200) return 1;
-            if (atoi(value) == 204) {
+            if (atoi(value) == 200 || atoi(value) == 201 || atoi(value) == 202) return 1;  
+            else if (atoi(value) == 403) return 0;
+            else if (atoi(value) == 204) {
                 glcd_clear();
                 draw_bitmap(0, 0, sahmiye_tamam, 128, 64);
                 delay_ms(300);
                 return 0;
             }
-            if (atoi(value) == 201) return 1;
-            if (atoi(value) == 202) return 1;
-            else if (atoi(value) == 403) return 0;
+//            if (atoi(value) == 201) return 1;
+//            if (atoi(value) == 202) return 1;
+//            else if (atoi(value) == 403) return 0;
 
         }
     }
@@ -409,14 +411,14 @@ unsigned char get_data(const char* phone_number, int product_id, int device_id, 
 //    glcd_outtextxy(0, 10, value);
 //
 //    delay_ms(500);
-
-    if(strlen(re) < 6 && product_id < 0){
+    
+    if(strlen(re) < 6 && product_id < 0 && strcmp(phone_number, "0")){
         glcd_clear();
         //glcd_rectrel(0,0,128,64);
         draw_bitmap(0, 0, talash_mojadad, 128, 64);
         delay_ms(300);
     }
-    else if (strlen(re) < 6 && product_id < 0 && strcmp(phone_number, "0")){
+    else if (strlen(re) < 6 && product_id < 0 && !strcmp(phone_number, "0")){
         return 1;
     }
 
@@ -436,7 +438,7 @@ void handle_sms(void)
     //char tmp[2];
     //const char* server_url_post = "http://185.8.173.17:8000/home/post/";
     int product_id = -1;
-    int device_id = 7653;
+    int device_id = 5214;
 
     int timeout_counter = 0;
     char key_pressed;
@@ -724,6 +726,16 @@ void main(void)
         //char cmd[100];
         uint32_t now;
 
+//        draw_bitmap(0, 0, kode_mahsol_payamak_konid, 128, 64);
+        if (device_status){ 
+            //glcd_clear();
+            draw_bitmap(0, 0, kode_mahsol_payamak_konid, 128, 64);
+        }
+        if (!device_status){ 
+            //glcd_clear();
+            glcd_outtextxy(0, 0, "deactivate");
+        }
+
         if (read_button_debounced())
         {
 
@@ -736,7 +748,7 @@ void main(void)
 
         // UI + UART processing
         //glcd_clear();
-        draw_bitmap(0, 0, kode_mahsol_payamak_konid, 128, 64);
+        
         process_uart_data();
 
         // Handle incoming SMS (blocking)
@@ -769,6 +781,20 @@ void main(void)
             glcd_clear();
 
         }
+
+//        if (!processing_sms && (uint32_t)(millis() - last_time_health) > 30000) {
+//            if (get_data("0", -1, device_id, "0")){
+//                device_status = 1;
+//            }
+//            else {
+//                device_status = 0;
+//            }
+//            last_time_health = millis();
+//            uart_buffer_reset();
+//            glcd_clear();
+//        }
+
+
 
 //        // Periodic health check (every ~10s)
 //        if (!processing_sms && (uint32_t)(millis() - last_time_health) > 10000) {

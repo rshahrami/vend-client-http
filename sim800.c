@@ -9,7 +9,7 @@
 //#define BUFFER_SIZE 512
 //#define MAX_RETRY   5   // ?????? ????? ????
 
-#define SIGNAL_CHECKS 5
+//#define SIGNAL_CHECKS 5
 
 #define LOOP_CHECK 3
 //uint8_t site_counter = 0;
@@ -83,7 +83,7 @@ void sim800_restart(void) {
         uart_buffer_reset(); send_at_command("AT+CFUN=1,1");
         read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK"); // (E??I?? C?? ??C?I)
         //glcd_outtextxy(0, 10, "Rebooting, AT ...");
-        while (attemptss<5) {
+        while (attemptss<LOOP_CHECK) {
             uart_buffer_reset();
             send_at_command("AT");
             if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 2000, "OK")) {
@@ -205,7 +205,7 @@ unsigned char init_GPRS(void)
 //                        glcd_outtextxy(0, 0, value);
 //                        delay_ms(300);
 
-                        glcd_outtextxy(0, 22, "> GPRS     OK!");
+                        glcd_outtextxy(0, 22, "> GP     OK!");
 
                         return 1; // ????
                     }
@@ -234,7 +234,7 @@ void http_connect(void)
     uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"CID\",1");
     (void)read_until_keyword_keep_all(buffer, sizeof(buffer), 2000, "OK");
 
-    glcd_outtextxy(0, 32, "> HTTP     OK!");
+    glcd_outtextxy(0, 32, "> HT     OK!");
 
 
 
@@ -292,7 +292,7 @@ uint8_t checking(void)
 {
 
     glcd_clear();
-    glcd_outtextxy(0, 0, "Checking ...");
+    glcd_outtextxy(0, 0, "> Checking ...");
 
     // 0) AT ????
     uart_buffer_reset(); send_at_command("AT");
@@ -304,7 +304,7 @@ uint8_t checking(void)
         return 0;
     }
 
-    glcd_outtextxy(0, 10, "step 1");
+//    glcd_outtextxy(0, 10, "step 1");
     // 1) ????? attach
     uart_buffer_reset(); send_at_command("AT+CGATT?");
     if (read_until_keyword_keep_all(buffer, BUFFER_SIZE, 1500, "+CGATT:")) {
@@ -375,8 +375,8 @@ uint8_t checking(void)
 
 
 void http_keep_alive(void) {
-    glcd_clear();
-    glcd_outtextxy(0, 0, "Keep_Alive ...");
+//    glcd_clear();
+//    glcd_outtextxy(0, 0, "Keep_Alive ...");
 
     uart_buffer_reset(); send_at_command("AT+HTTPPARA=\"URL\",\"http://www.google.com\"");
     (void)read_until_keyword_keep_all(buffer, BUFFER_SIZE, 500, "OK");

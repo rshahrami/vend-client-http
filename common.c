@@ -23,7 +23,7 @@ char APN[] = "mcinet";
 // ?? ??????? 2 (???????)
 //char APP_HOST[] = "185.8.173.17";   // ? œÌêÂ const ‰»«‘Â  « »—Â RAM
 //const uint16_t APP_PORT = 9224;
-int device_id = 7653;
+int device_id = 5214;
 
 //uint8_t app_had_traffic_since_last_check = 0;
 
